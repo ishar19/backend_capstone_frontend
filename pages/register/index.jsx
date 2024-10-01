@@ -1,17 +1,24 @@
 import Form from "../../components/form";
 import { useState } from "react";
+import { register } from "../../services/auth";
+import { useNavigate } from "react-router-dom";
 export default function Register() {
+    const navigate = useNavigate();
     const [formData, setFormData] = useState({
         name: "",
         email: "",
+        mobile: "",
         password: "",
-        confirmPassword: ""
+        confirmPassword: "",
+        checkBox: false
     });
     const [error, setError] = useState({
         name: false,
         email: false,
         password: false,
-        confirmPassword: false
+        mobile: false,
+        confirmPassword: false,
+        checkBox: false
     });
     const formFields = [
         {
@@ -48,17 +55,24 @@ export default function Register() {
             onChange: (e) => {
                 setFormData({ ...formData, confirmPassword: e.target.value })
             }
+        }, {
+            name: "mobile",
+            type: "text",
+            placeholder: "Enter your mobile number",
+            value: formData.mobile,
+            onChange: (e) => {
+                setFormData({ ...formData, mobile: e.target.value })
+            }
+        }, {
+            name: "checkBox",
+            type: "checkbox",
+            label: "Agree to terms and conditions",
+            value: formData.checkBox,
+            onChange: (e) => {
+                setFormData({ ...formData, checkBox: e.target.checked })
+            }
         }
     ]
-    const onSubmit = (e) => {
-        e.preventDefault();
-        console.log(errorMessages["name"].isValid);
-        Object.keys(errorMessages).forEach(key => {
-            if (!errorMessages[key].isValid) {
-                errorMessages[key].onError();
-            }
-        })
-    }
     const errorMessages = {
         name: {
             message: "Name is required",
@@ -87,8 +101,43 @@ export default function Register() {
             onError: () => {
                 setError((error) => ({ ...error, confirmPassword: true }))
             }
+        },
+        mobile: {
+            message: "Mobile number is required",
+            isValid: formData.mobile.length > 0,
+            onError: () => {
+                setError((error) => ({ ...error, mobile: true }))
+            }
+        },
+        checkBox: {
+            message: "You must agree to terms and conditions",
+            isValid: formData.checkBox,
+            onError: () => {
+                setError((error) => ({ ...error, checkBox: true }))
+            }
         }
     }
+    const onSubmit = async (e) => {
+        let isError = false;
+        e.preventDefault();
+        Object.keys(errorMessages).forEach(key => {
+            if (!errorMessages[key].isValid) {
+                isError = true;
+                errorMessages[key].onError();
+            }
+        })
+        if (!isError) {
+            const res = await register(formData);
+            if (res.status === 201) {
+                alert("Registered successfully");
+                navigate("/");
+            }
+            else {
+                alert("Something went wrong");
+            }
+        }
+    }
+
 
     return (
         <><p>Register</p><Form error={error} formFields={formFields} onSubmit={onSubmit} errorMessages={errorMessages} /></>
