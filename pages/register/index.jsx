@@ -130,15 +130,13 @@ export default function Register() {
             const res = await register(formData);
             if (res.status === 201) {
                 alert("Registered successfully");
-                navigate("/");
+                navigate("/login");
             }
             else {
                 alert("Something went wrong");
             }
         }
     }
-
-
     return (
         <><p>Register</p><Form error={error} formFields={formFields} onSubmit={onSubmit} errorMessages={errorMessages} /></>
     )
