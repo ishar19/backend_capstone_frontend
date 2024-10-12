@@ -1,4 +1,6 @@
-export function AddTokenToHeader({ headers }) {
+import { decodeToken } from "react-jwt";
+
+export function addTokenToHeader({ headers }) {
     const token = localStorage.getItem("token");
     if (token) {
         headers.Authorization = `${token}`;
@@ -28,4 +30,13 @@ export function handleApiResponse(res) {
             alert("Something went wrong");
             break;
     }
+}
+
+export function isEditable(id) {
+    const token = localStorage.getItem("token");
+    if (!token) {
+        return false;
+    }
+    const decoded = decodeToken(token);
+    return decoded.id == id;
 }
