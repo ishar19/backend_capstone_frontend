@@ -23,3 +23,11 @@ export function fetchJobById(id) {
     });
     return res;
 }
+
+export function addJob(data) {
+    const headers = addTokenToHeader({ headers: {} });
+    const res = axios.post(`${import.meta.env.VITE_BASE_URL}/api/v1/job`, data, {
+        headers
+    });
+    return res;
+}
