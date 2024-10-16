@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AddJob, EditJob, JobDetail, JobList, Login, Register, NotFound } from "../pages/index";
+import { AddJob, JobDetail, JobList, Login, Register, NotFound } from "../pages/index";
 
 export default function App() {
   return (
@@ -7,7 +7,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<JobList />} />
         <Route path="/addjob" element={<AddJob />} />
-        <Route path="/editjob" element={<EditJob />} />
+        <Route path="/editjob/:id" element={<AddJob />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="*" element={<NotFound />} />

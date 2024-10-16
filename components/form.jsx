@@ -1,15 +1,15 @@
 /* eslint-disable react/prop-types */
-function FormField({ name, type, placeholder, value, onChange, label, values, options, chosen }) {
+function FormField({ name, type, placeholder, value, onChange, label, values, chosen }) {
     return (
         <>{type === "dropdown" ? <select value={value} onChange={onChange} name={name}>
             {values.map((value, idx) => <option key={idx} value={value}>{value}</option>)}
-        </select> : <input id={name} value={value} onChange={onChange} name={name} type={type} placeholder={placeholder} />}
+        </select> : <input checked={value} id={name} value={value} onChange={onChange} name={name} type={type} placeholder={placeholder} />}
             {chosen ? chosen : null}
             {label ? <label id={name} htmlFor={name}>{label}</label> : null}
         </>
     )
 }
-export default function Form({ formFields, onSubmit, error, errorMessages }) {
+export default function Form({ isEdit = false, formFields, onSubmit, error, errorMessages }) {
 
     return <form onSubmit={onSubmit}>
         {
@@ -22,7 +22,7 @@ export default function Form({ formFields, onSubmit, error, errorMessages }) {
                 </>
             ))
         }
-        <button type="submit">Submit</button>
+        <button type="submit">{isEdit ? "Update" : "Submit"}</button>
     </form >
 
 }

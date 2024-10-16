@@ -1,8 +1,14 @@
 import Form from "../../components/form";
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { addJob } from "../../services/job";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { addJob, editJob, fetchJobById } from "../../services/job";
+// addjob -> /addjob
+// edit -> /edit/1234
 export default function AddJob() {
+    const params = useParams();
+    const id = params.id;
+    const isEdit = !!id;
+    console.log(isEdit);
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
         name: "",
@@ -52,18 +58,18 @@ export default function AddJob() {
         },
         {
             name: "salary",
-            type: "text",
+            type: "number",
             placeholder: "Enter job salary",
             value: formData.salary,
             onChange: (e) => {
-                setFormData({ ...formData, salary: e.target.value })
+                setFormData({ ...formData, salary: parseInt(e.target.value, 10) })
             }
         },
         {
             name: "jobType",
             type: "dropdown",
             label: "Job Type",
-            values: ["Full-time", "Part-time", "Contract"],
+            values: ["full-time", "part-time", "contract", "internship"],
             placeholder: "Enter job type",
             value: formData.jobType,
             onChange: (e) => {
@@ -162,8 +168,8 @@ export default function AddJob() {
             }
         },
         salary: {
-            message: "Salary is required",
-            isValid: formData.salary.length > 0,
+            message: "Salary is required and should be a number",
+            isValid: typeof formData.salary === "number",
             onError: () => {
                 setError((error) => ({ ...error, salary: true }))
             }
@@ -211,6 +217,8 @@ export default function AddJob() {
             }
         },
     }
+    console.log(formData);
+    console.log(error)
     const handleSubmit = async (e) => {
         e.preventDefault();
         let isError = false;
@@ -221,10 +229,23 @@ export default function AddJob() {
             }
         })
         if (!isError) {
+            setError({
+                name: false,
+                logo: false,
+                position: false,
+                salary: false,
+                jobType: false,
+                remote: false,
+                location: false,
+                description: false,
+                about: false,
+                information: false,
+                skills: false,
+            })
             console.log(formData);
-            const res = await addJob(formData);
-            if (res.status === 201) {
-                alert("Job added successfully");
+            const res = isEdit ? await editJob(formData, id) : await addJob(formData);
+            if (res.status === 200) {
+                alert(`Job ${isEdit ? "updated" : "added"} successfully`);
                 navigate("/list");
             }
             else {
@@ -235,10 +256,45 @@ export default function AddJob() {
             alert("Something went wrong");
         }
     }
+    const fillJobData = (data) => {
+        const { name,
+            logo,
+            position,
+            salary,
+            jobType,
+            remote,
+            location,
+            description,
+            about,
+            information,
+            skills } = data
+
+        const jobSkills = skills?.map((item) => item[0]).join(",")
+        setFormData({
+            name,
+            logo,
+            position,
+            salary,
+            jobType,
+            remote,
+            location,
+            description,
+            about,
+            information,
+            skills: jobSkills
+        })
+    }
+    useEffect(() => {
+        if (isEdit) {
+            fetchJobById(id).then(res => {
+                fillJobData(res.data)
+            })
+        }
+    }, [isEdit])
     return (
         <>
             <p>Add job</p>
-            <> <Form error={error} formFields={formFields} onSubmit={handleSubmit} errorMessages={errorMessages} /></>
+            <> <Form error={error} formFields={formFields} onSubmit={handleSubmit} isEdit={isEdit} errorMessages={errorMessages} /></>
         </>
     )
 }

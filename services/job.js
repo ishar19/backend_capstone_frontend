@@ -31,3 +31,15 @@ export function addJob(data) {
     });
     return res;
 }
+export function editJob(data, id) {
+    const headers = addTokenToHeader({ headers: {} });
+    const res = axios.put(`${import.meta.env.VITE_BASE_URL}/api/v1/job/${id}`, data, {
+        headers
+    });
+    return res;
+}
+
+export function searchJobs(title) {
+    const res = axios.get(`${import.meta.env.VITE_BASE_URL}/api/v1/job/search/${title}`);
+    return res;
+}
